@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.env
+*.db
+embeddings_cache.json
+
+# Node / React
+node_modules/
+dist/
+.env.local
+
+# OS / IDE
+.DS_Store
+.vscode/
+.idea/

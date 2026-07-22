@@ -1,0 +1,122 @@
+[
+  {
+    "id": "q1",
+    "topic": "arrays",
+    "difficulty": "easy",
+    "question": "Given an array of integers, find two numbers that add up to a specific target. Return their indices."
+  },
+  {
+    "id": "q2",
+    "topic": "arrays",
+    "difficulty": "medium",
+    "question": "Given an array, find the maximum sum of a contiguous subarray (Kadane's Algorithm)."
+  },
+  {
+    "id": "q3",
+    "topic": "strings",
+    "difficulty": "easy",
+    "question": "Check whether a given string is a palindrome, ignoring case and non-alphanumeric characters."
+  },
+  {
+    "id": "q4",
+    "topic": "strings",
+    "difficulty": "medium",
+    "question": "Given a string, find the length of the longest substring without repeating characters."
+  },
+  {
+    "id": "q5",
+    "topic": "linked_lists",
+    "difficulty": "medium",
+    "question": "Reverse a singly linked list, both iteratively and recursively."
+  },
+  {
+    "id": "q6",
+    "topic": "linked_lists",
+    "difficulty": "medium",
+    "question": "Detect whether a linked list has a cycle, and find the node where the cycle begins."
+  },
+  {
+    "id": "q7",
+    "topic": "trees",
+    "difficulty": "medium",
+    "question": "Given a binary tree, return its level order traversal (BFS)."
+  },
+  {
+    "id": "q8",
+    "topic": "trees",
+    "difficulty": "hard",
+    "question": "Given a binary tree, find the lowest common ancestor of two given nodes."
+  },
+  {
+    "id": "q9",
+    "topic": "graphs",
+    "difficulty": "medium",
+    "question": "Given a 2D grid of '1's (land) and '0's (water), count the number of islands."
+  },
+  {
+    "id": "q10",
+    "topic": "graphs",
+    "difficulty": "hard",
+    "question": "Given a graph, determine if it contains a cycle using both DFS and Union-Find approaches."
+  },
+  {
+    "id": "q11",
+    "topic": "dynamic_programming",
+    "difficulty": "medium",
+    "question": "Given a set of coin denominations, find the minimum number of coins needed to make a given amount."
+  },
+  {
+    "id": "q12",
+    "topic": "dynamic_programming",
+    "difficulty": "hard",
+    "question": "Find the length of the longest common subsequence between two strings."
+  },
+  {
+    "id": "q13",
+    "topic": "system_design",
+    "difficulty": "medium",
+    "question": "How would you design a URL shortening service like bit.ly? Discuss data model, scaling, and collision handling."
+  },
+  {
+    "id": "q14",
+    "topic": "system_design",
+    "difficulty": "hard",
+    "question": "How would you design a rate limiter for an API gateway handling millions of requests per second?"
+  },
+  {
+    "id": "q15",
+    "topic": "oop",
+    "difficulty": "easy",
+    "question": "Explain the four pillars of object-oriented programming with real-world examples."
+  },
+  {
+    "id": "q16",
+    "topic": "oop",
+    "difficulty": "medium",
+    "question": "What is the difference between method overloading and method overriding? When would you use each?"
+  },
+  {
+    "id": "q17",
+    "topic": "databases",
+    "difficulty": "medium",
+    "question": "Explain the difference between SQL and NoSQL databases, and when you'd choose one over the other."
+  },
+  {
+    "id": "q18",
+    "topic": "databases",
+    "difficulty": "medium",
+    "question": "What is database normalization? Explain 1NF, 2NF, and 3NF with an example."
+  },
+  {
+    "id": "q19",
+    "topic": "operating_systems",
+    "difficulty": "medium",
+    "question": "Explain the difference between a process and a thread, and the tradeoffs of using each for concurrency."
+  },
+  {
+    "id": "q20",
+    "topic": "operating_systems",
+    "difficulty": "hard",
+    "question": "What is a deadlock? Explain the four necessary conditions for deadlock and one way to prevent it."
+  }
+]
