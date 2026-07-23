@@ -5,7 +5,10 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:postgres@localhost:5432/interview_platform").strip()
+DATABASE_URL = os.getenv("DATABASE_URL", "").strip()
+
+if not DATABASE_URL:
+    DATABASE_URL = "sqlite:///./sql_app.db"
 
 # Sanitize trailing period or whitespace (e.g. if copied from documentation text ending in ".")
 if DATABASE_URL.endswith("."):
@@ -19,7 +22,8 @@ if DATABASE_URL.startswith("postgres://"):
 DATABASE_URL = DATABASE_URL.replace("channel_binding=require.", "channel_binding=require")
 DATABASE_URL = DATABASE_URL.replace("sslmode=require.", "sslmode=require")
 
-engine = create_engine(DATABASE_URL)
+connect_args = {"check_same_thread": False} if DATABASE_URL.startswith("sqlite") else {}
+engine = create_engine(DATABASE_URL, connect_args=connect_args)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 

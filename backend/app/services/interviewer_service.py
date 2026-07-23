@@ -5,11 +5,12 @@ from app.services.rag_service import retrieve_relevant_questions
 
 load_dotenv()
 
-# Groq exposes an OpenAI-compatible API, so we just point the OpenAI client at Groq's endpoint
-client = OpenAI(
-    api_key=os.getenv("GROQ_API_KEY"),
-    base_url="https://api.groq.com/openai/v1",
-)
+def get_client() -> OpenAI:
+    api_key = os.getenv("GROQ_API_KEY") or "placeholder_key"
+    return OpenAI(
+        api_key=api_key,
+        base_url="https://api.groq.com/openai/v1",
+    )
 
 # A fast, free-tier-friendly Groq model, good for quick interview-style responses
 MODEL_NAME = "llama-3.1-8b-instant"
@@ -40,7 +41,7 @@ def generate_follow_up(question: str, candidate_answer: str) -> str:
     )
     user_prompt = f"Original question: {question}\n\nCandidate's answer: {candidate_answer}"
 
-    response = client.chat.completions.create(
+    response = get_client().chat.completions.create(
         model=MODEL_NAME,
         messages=[
             {"role": "system", "content": system_prompt},
@@ -65,7 +66,7 @@ def evaluate_answer(question: str, candidate_answer: str) -> dict:
     )
     user_prompt = f"Question: {question}\n\nCandidate's answer: {candidate_answer}"
 
-    response = client.chat.completions.create(
+    response = get_client().chat.completions.create(
         model=MODEL_NAME,
         messages=[
             {"role": "system", "content": system_prompt},
