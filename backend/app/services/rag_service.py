@@ -64,33 +64,39 @@ def build_index(force: bool = False):
     """
     global _index
 
-    if not force and os.path.exists(EMBEDDINGS_CACHE_PATH):
-        cached = _load_index_from_cache()
+    try:
+        if not force and os.path.exists(EMBEDDINGS_CACHE_PATH):
+            cached = _load_index_from_cache()
+            questions = load_question_bank()
+            if cached is not None and len(cached["ids"]) >= len(questions):
+                print(f"Index already has {len(cached['ids'])} questions cached. Skipping rebuild.")
+                return
+
         questions = load_question_bank()
-        if cached is not None and len(cached["ids"]) >= len(questions):
-            print(f"Index already has {len(cached['ids'])} questions cached. Skipping rebuild.")
-            return
+        texts = [q["question"] for q in questions]
+        embeddings = get_embeddings(texts)
 
-    questions = load_question_bank()
-    texts = [q["question"] for q in questions]
-    embeddings = get_embeddings(texts)
+        cache_data = {
+            "ids": [q["id"] for q in questions],
+            "questions": texts,
+            "metadatas": [{"topic": q["topic"], "difficulty": q["difficulty"]} for q in questions],
+            "embeddings": embeddings,
+        }
+        try:
+            with open(EMBEDDINGS_CACHE_PATH, "w") as f:
+                json.dump(cache_data, f)
+        except Exception:
+            pass
 
-    cache_data = {
-        "ids": [q["id"] for q in questions],
-        "questions": texts,
-        "metadatas": [{"topic": q["topic"], "difficulty": q["difficulty"]} for q in questions],
-        "embeddings": embeddings,
-    }
-    with open(EMBEDDINGS_CACHE_PATH, "w") as f:
-        json.dump(cache_data, f)
-
-    _index = {
-        "ids": cache_data["ids"],
-        "questions": cache_data["questions"],
-        "metadatas": cache_data["metadatas"],
-        "embeddings": _normalize(np.array(embeddings, dtype=np.float32)),
-    }
-    print(f"Indexed {len(questions)} questions locally and cached to disk.")
+        _index = {
+            "ids": cache_data["ids"],
+            "questions": cache_data["questions"],
+            "metadatas": cache_data["metadatas"],
+            "embeddings": _normalize(np.array(embeddings, dtype=np.float32)),
+        }
+        print(f"Indexed {len(questions)} questions locally.")
+    except Exception as err:
+        print(f"Warning: RAG index build skipped or failed: {err}")
 
 
 def _get_index():
@@ -106,23 +112,44 @@ def retrieve_relevant_questions(query: str, top_k: int = 3) -> list[dict]:
     """
     Embeds the user's query and finds the top-k most semantically similar
     questions from the indexed question bank using cosine similarity.
+    Falls back to matching by topic if embedding model is unavailable.
     """
-    index = _get_index()
+    questions = load_question_bank()
+    try:
+        index = _get_index()
+        if index is not None and len(index.get("embeddings", [])) > 0:
+            query_embedding = np.array(get_embeddings([query])[0], dtype=np.float32)
+            query_embedding = query_embedding / (np.linalg.norm(query_embedding) or 1e-10)
 
-    query_embedding = np.array(get_embeddings([query])[0], dtype=np.float32)
-    query_embedding = query_embedding / (np.linalg.norm(query_embedding) or 1e-10)
+            similarities = index["embeddings"] @ query_embedding
+            top_k_count = min(top_k, len(similarities))
+            top_indices = np.argsort(-similarities)[:top_k_count]
 
-    similarities = index["embeddings"] @ query_embedding
-    top_k = min(top_k, len(similarities))
-    top_indices = np.argsort(-similarities)[:top_k]
+            results = []
+            for idx in top_indices:
+                results.append({
+                    "id": index["ids"][idx],
+                    "question": index["questions"][idx],
+                    "topic": index["metadatas"][idx]["topic"],
+                    "difficulty": index["metadatas"][idx]["difficulty"],
+                    "distance": float(1.0 - float(similarities[idx])),
+                })
+            return results
+    except Exception as err:
+        print(f"Vector search failed ({err}), falling back to direct question bank search.")
 
+    # Fallback: simple topic or keyword match
+    query_lower = query.lower()
+    matched = [q for q in questions if query_lower in q["topic"].lower() or any(w in q["question"].lower() for w in query_lower.split())]
+    if not matched:
+        matched = questions
     results = []
-    for idx in top_indices:
+    for q in matched[:top_k]:
         results.append({
-            "id": index["ids"][idx],
-            "question": index["questions"][idx],
-            "topic": index["metadatas"][idx]["topic"],
-            "difficulty": index["metadatas"][idx]["difficulty"],
-            "distance": float(1.0 - float(similarities[idx])),
+            "id": q["id"],
+            "question": q["question"],
+            "topic": q["topic"],
+            "difficulty": q["difficulty"],
+            "distance": 0.0,
         })
     return results
